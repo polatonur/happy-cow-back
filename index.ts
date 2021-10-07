@@ -4,7 +4,10 @@ const express = require("express");
 import { Request, Response } from "express";
 const formidableMiddleware = require("express-formidable");
 const cors = require("cors");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
+// call express
 const app = express();
 app.use(formidableMiddleware());
 app.use(cors());
@@ -12,12 +15,18 @@ app.use(cors());
 const restaurantRoutes = require("./routes/restaurant");
 app.use(restaurantRoutes);
 
-// home route
+// MONGOOSE CONNECT
+mongoose.connect(process.env.MONGODB_URI, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+});
+
+// HOME ROUTE
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Welcome to my happ cow app" });
 });
 
-// all route
+// ALL ROUTE
 app.all("*", (req: Request, res: Response) => {
   res.status(404).send("Oops!, Page not found");
 });

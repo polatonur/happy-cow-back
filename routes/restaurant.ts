@@ -6,13 +6,18 @@ const axios = require("axios");
 
 const router = express.Router();
 
-// all restaurants route
-router.get("/restautants/all", async (req: Request, res: Response) => {
+// import restaurant model
+const Restaurant = require("../models/Restaurant");
+
+// HOMEPAGE 20 BEST RESTAURANT ROUTE
+router.get("/restaurants/best", async (req: Request, res: Response) => {
   try {
-    const response = await axios.get(
-      "https://res.cloudinary.com/lereacteur-apollo/raw/upload/v1575242111/10w-full-stack/Scraping/restaurants.json"
-    );
-    res.status(200).send(response.data);
+    const restaurants = await Restaurant.find({
+      thumbnail: { $ne: "https://www.happycow.net/img/no-image.jpg" },
+    })
+      .sort({ rating: -1 })
+      .limit(20);
+    res.status(200).send(restaurants);
   } catch (error: any) {
     res.status(400).json({
       message: error.message,

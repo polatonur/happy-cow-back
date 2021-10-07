@@ -12,11 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const axios = require("axios");
 const router = express.Router();
-// all restaurants route
-router.get("/restautants/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// import restaurant model
+const Restaurant = require("../models/Restaurant");
+// HOMEPAGE 20 BEST RESTAURANT ROUTE
+router.get("/restaurants/best", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const response = yield axios.get("https://res.cloudinary.com/lereacteur-apollo/raw/upload/v1575242111/10w-full-stack/Scraping/restaurants.json");
-        res.status(200).send(response.data);
+        const restaurants = yield Restaurant.find({
+            thumbnail: { $ne: "https://www.happycow.net/img/no-image.jpg" },
+        })
+            .sort({ rating: -1 })
+            .limit(20);
+        res.status(200).send(restaurants);
     }
     catch (error) {
         res.status(400).json({
