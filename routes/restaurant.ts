@@ -25,4 +25,28 @@ router.get("/restaurants/best", async (req: Request, res: Response) => {
   }
 });
 
+// restaurant details route
+router.get("/restaurant/:id", async (req: Request, res: Response) => {
+  const id = req.params.id;
+  try {
+    const restaurant = await Restaurant.findById(id);
+
+    const nearByRestaurantsIds: Array<number> = restaurant.nearbyPlacesIds;
+
+    const nearByRestaurants = await Restaurant.find({
+      placeId: { $in: nearByRestaurantsIds },
+    }).select("name address thumbnail type rating");
+    // console.log(nearByRestaurants);
+
+    res.status(200).json({
+      result: restaurant,
+      near: nearByRestaurants,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+});
+
 module.exports = router;

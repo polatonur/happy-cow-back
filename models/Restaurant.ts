@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 
 export type RestaurantType = {
-  placeId: string;
+  placeId: number;
   name: string;
   address: string;
   location: {
@@ -21,11 +21,11 @@ export type RestaurantType = {
   price: string;
   website: string;
   facebook: string;
-  nearbyPlaces: string[];
+  nearbyPlacesIds: string[];
 };
 
 const restaurantSchema = new Schema<RestaurantType>({
-  placeId: String,
+  placeId: Number,
   name: String,
   address: String,
   location: {
@@ -45,7 +45,7 @@ const restaurantSchema = new Schema<RestaurantType>({
   price: String,
   website: String,
   facebook: String,
-  nearbyPlaces: Array,
+  nearbyPlacesIds: Array,
 });
 
 const Restaurant = model<RestaurantType>("restaurant", restaurantSchema);

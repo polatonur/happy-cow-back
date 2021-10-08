@@ -30,4 +30,25 @@ router.get("/restaurants/best", (req, res) => __awaiter(void 0, void 0, void 0, 
         });
     }
 }));
+// restaurant details route
+router.get("/restaurant/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    try {
+        const restaurant = yield Restaurant.findById(id);
+        const nearByRestaurantsIds = restaurant.nearbyPlacesIds;
+        const nearByRestaurants = yield Restaurant.find({
+            placeId: { $in: nearByRestaurantsIds },
+        }).select("name address thumbnail type rating");
+        // console.log(nearByRestaurants);
+        res.status(200).json({
+            result: restaurant,
+            near: nearByRestaurants,
+        });
+    }
+    catch (error) {
+        res.status(400).json({
+            message: error.message,
+        });
+    }
+}));
 module.exports = router;

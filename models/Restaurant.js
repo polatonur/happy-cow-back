@@ -1,7 +1,8 @@
 "use strict";
-const { Schema, model } = require("mongoose");
-const restaurantSchema = Schema({
-    placeId: String,
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = require("mongoose");
+const restaurantSchema = new mongoose_1.Schema({
+    placeId: Number,
     name: String,
     address: String,
     location: {
@@ -21,7 +22,7 @@ const restaurantSchema = Schema({
     price: String,
     website: String,
     facebook: String,
-    nearbyPlaces: Array,
+    nearbyPlacesIds: Array,
 });
-const Restaurant = model("restaurant", restaurantSchema);
+const Restaurant = (0, mongoose_1.model)("restaurant", restaurantSchema);
 module.exports = Restaurant;
