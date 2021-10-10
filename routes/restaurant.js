@@ -14,6 +14,7 @@ const axios = require("axios");
 const router = express.Router();
 // import restaurant model
 const Restaurant = require("../models/Restaurant");
+const User = require("../models/User");
 // HOMEPAGE 20 BEST RESTAURANT ROUTE
 router.get("/restaurants/best", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -37,6 +38,7 @@ router.get("/restaurant/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
         const restaurant = yield Restaurant.findById(id);
         const nearByRestaurantsIds = restaurant.nearbyPlacesIds;
         const nearByRestaurants = yield Restaurant.find({
+            thumbnail: { $ne: "https://www.happycow.net/img/no-image.jpg" },
             placeId: { $in: nearByRestaurantsIds },
         }).select("name address thumbnail type rating");
         // console.log(nearByRestaurants);

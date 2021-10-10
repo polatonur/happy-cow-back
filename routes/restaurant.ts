@@ -8,6 +8,11 @@ const router = express.Router();
 
 // import restaurant model
 const Restaurant = require("../models/Restaurant");
+const User = require("../models/User");
+const Review = require("../models/Restaurant");
+
+// isAthenticated
+const isAthenticated = require("../middlewares/isAuthenticated");
 
 // HOMEPAGE 20 BEST RESTAURANT ROUTE
 router.get("/restaurants/best", async (req: Request, res: Response) => {
@@ -30,10 +35,11 @@ router.get("/restaurant/:id", async (req: Request, res: Response) => {
   const id = req.params.id;
   try {
     const restaurant = await Restaurant.findById(id);
-
     const nearByRestaurantsIds: Array<number> = restaurant.nearbyPlacesIds;
+    const reviews = await Review.find({ restaurantId: id });
 
     const nearByRestaurants = await Restaurant.find({
+      thumbnail: { $ne: "https://www.happycow.net/img/no-image.jpg" },
       placeId: { $in: nearByRestaurantsIds },
     }).select("name address thumbnail type rating");
     // console.log(nearByRestaurants);
@@ -41,6 +47,7 @@ router.get("/restaurant/:id", async (req: Request, res: Response) => {
     res.status(200).json({
       result: restaurant,
       near: nearByRestaurants,
+      reviews: reviews,
     });
   } catch (error: any) {
     res.status(400).json({
@@ -48,5 +55,27 @@ router.get("/restaurant/:id", async (req: Request, res: Response) => {
     });
   }
 });
+
+router(
+  "/restaurant/review",
+  isAthenticated,
+  async (req: Request, res: Response) => {
+    try {
+      const { title, body, userId, restaurantId, rating } = req.body;
+      const newReview = new Review({
+        title: title,
+        body: body,
+        owner: userId,
+        rating: rating,
+        restaurantId: restaurantId,
+      });
+      await newReview.save();
+    } catch (error: any) {
+      res.status(400).json({
+        message: error.messsage,
+      });
+    }
+  }
+);
 
 module.exports = router;
