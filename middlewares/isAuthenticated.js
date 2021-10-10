@@ -14,14 +14,15 @@ const isAthenticated = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     console.log("Athenticating...");
     try {
         if (req.headers.authorization) {
+            console.log(req.headers.authorization);
             const token = req.headers.authorization.replace("Bearer ", "");
             console.log("token==>", token);
-            const user = yield User.findOne({ token });
+            const user = yield User.findOne({ token: token });
             if (user) {
                 return next();
             }
             else {
-                res.json(401).json({
+                res.status(401).json({
                     message: "Unauthorized",
                 });
             }
@@ -33,7 +34,8 @@ const isAthenticated = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         }
     }
     catch (error) {
-        res.status(200).json({
+        console.log(error.message);
+        res.status(401).json({
             message: error.message,
         });
     }

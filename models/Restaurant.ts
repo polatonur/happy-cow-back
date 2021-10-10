@@ -22,6 +22,7 @@ export type RestaurantType = {
   website: string;
   facebook: string;
   nearbyPlacesIds: string[];
+  favorite: number;
 };
 
 const restaurantSchema = new Schema<RestaurantType>({
@@ -46,6 +47,7 @@ const restaurantSchema = new Schema<RestaurantType>({
   website: String,
   facebook: String,
   nearbyPlacesIds: Array,
+  favorite: Number,
 });
 
 const Restaurant = model<RestaurantType>("restaurant", restaurantSchema);

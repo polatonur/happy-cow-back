@@ -23,6 +23,7 @@ const restaurantSchema = new mongoose_1.Schema({
     website: String,
     facebook: String,
     nearbyPlacesIds: Array,
+    favorite: Number,
 });
 const Restaurant = (0, mongoose_1.model)("restaurant", restaurantSchema);
 module.exports = Restaurant;

@@ -8,17 +8,17 @@ const isAthenticated: RequestHandler = async (
   next: NextFunction
 ) => {
   console.log("Athenticating...");
-
   try {
     if (req.headers.authorization) {
-      const token = req.headers.authorization.replace("Bearer ", "");
-      console.log("token==>", token);
+      console.log(req.headers.authorization);
 
-      const user = await User.findOne({ token });
+      const token = req.headers.authorization.replace("Bearer ", "");
+
+      const user = await User.findOne({ token: token });
       if (user) {
         return next();
       } else {
-        res.json(401).json({
+        res.status(401).json({
           message: "Unauthorized",
         });
       }
@@ -28,7 +28,8 @@ const isAthenticated: RequestHandler = async (
       });
     }
   } catch (error: any) {
-    res.status(200).json({
+    console.log(error.message);
+    res.status(401).json({
       message: error.message,
     });
   }

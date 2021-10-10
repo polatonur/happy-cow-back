@@ -67,7 +67,6 @@ router.post("/user/login", (req, res) => __awaiter(void 0, void 0, void 0, funct
                     username: user.username,
                     email: user.email,
                     token: user.token,
-                    favorites: user.favorites,
                 });
             }
             else {
@@ -96,17 +95,19 @@ router.post("/user/favorites", isAthenticated, (req, res) => __awaiter(void 0, v
         });
         //   console.log("isexist==>", isExist);
         if (isExist) {
-            const updatedUser = yield User.findByIdAndUpdate(userId, {
+            yield User.findByIdAndUpdate(userId, {
                 $pull: { favorites: restaurantId },
             });
+            const updatedUser = yield User.findById(userId);
             res.status(200).json({
                 message: updatedUser.favorites,
             });
         }
         else {
-            const updatedUser = yield User.findByIdAndUpdate(userId, {
+            yield User.findByIdAndUpdate(userId, {
                 $push: { favorites: restaurantId },
             });
+            const updatedUser = yield User.findById(userId);
             res.status(200).json({
                 message: updatedUser.favorites,
             });

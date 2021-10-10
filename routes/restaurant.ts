@@ -56,7 +56,7 @@ router.get("/restaurant/:id", async (req: Request, res: Response) => {
   }
 });
 
-router(
+router.post(
   "/restaurant/review",
   isAthenticated,
   async (req: Request, res: Response) => {
@@ -77,5 +77,21 @@ router(
     }
   }
 );
+router.get("/rating", async (req: Request, res: Response) => {
+  try {
+    interface resto {
+      save: () => void;
+      favorite: number;
+    }
+    const restos: Array<resto> = await Restaurant.find({});
+    restos.forEach(async (elem) => {
+      elem.favorite = Math.floor(Math.random() * 10);
+      await elem.save();
+    });
+    res.send("ok");
+  } catch (error: any) {
+    res.send(error.message);
+  }
+});
 
 module.exports = router;

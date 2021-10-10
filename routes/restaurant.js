@@ -15,6 +15,9 @@ const router = express.Router();
 // import restaurant model
 const Restaurant = require("../models/Restaurant");
 const User = require("../models/User");
+const Review = require("../models/Restaurant");
+// isAthenticated
+const isAthenticated = require("../middlewares/isAuthenticated");
 // HOMEPAGE 20 BEST RESTAURANT ROUTE
 router.get("/restaurants/best", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -37,6 +40,7 @@ router.get("/restaurant/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
     try {
         const restaurant = yield Restaurant.findById(id);
         const nearByRestaurantsIds = restaurant.nearbyPlacesIds;
+        const reviews = yield Review.find({ restaurantId: id });
         const nearByRestaurants = yield Restaurant.find({
             thumbnail: { $ne: "https://www.happycow.net/img/no-image.jpg" },
             placeId: { $in: nearByRestaurantsIds },
@@ -45,12 +49,44 @@ router.get("/restaurant/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
         res.status(200).json({
             result: restaurant,
             near: nearByRestaurants,
+            reviews: reviews,
         });
     }
     catch (error) {
         res.status(400).json({
             message: error.message,
         });
+    }
+}));
+router.post("/restaurant/review", isAthenticated, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { title, body, userId, restaurantId, rating } = req.body;
+        const newReview = new Review({
+            title: title,
+            body: body,
+            owner: userId,
+            rating: rating,
+            restaurantId: restaurantId,
+        });
+        yield newReview.save();
+    }
+    catch (error) {
+        res.status(400).json({
+            message: error.messsage,
+        });
+    }
+}));
+router.get("/rating", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const restos = yield Restaurant.find({});
+        restos.forEach((elem) => __awaiter(void 0, void 0, void 0, function* () {
+            elem.favorite = Math.floor(Math.random() * 10);
+            yield elem.save();
+        }));
+        res.send("ok");
+    }
+    catch (error) {
+        res.send(error.message);
     }
 }));
 module.exports = router;
