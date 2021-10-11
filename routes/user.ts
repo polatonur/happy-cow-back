@@ -89,24 +89,70 @@ router.post(
         favorites: { $eq: restaurantId },
       });
       //   console.log("isexist==>", isExist);
-
+      let action = "inc";
       if (isExist) {
+        action = "dec";
         await User.findByIdAndUpdate(userId, {
           $pull: { favorites: restaurantId },
         });
+
+        const resto = await Restaurant.findByIdAndUpdate(
+          restaurantId,
+          {
+            $inc: { favorite: -1 },
+          },
+          {
+            new: true,
+          }
+        );
+        console.log("count==>", resto);
+
         const updatedUser = await User.findById(userId);
         res.status(200).json({
           message: updatedUser.favorites,
+          count: resto.favorite,
         });
       } else {
         await User.findByIdAndUpdate(userId, {
           $push: { favorites: restaurantId },
         });
+        const resto = await Restaurant.findByIdAndUpdate(
+          restaurantId,
+          {
+            $inc: { favorite: 1 },
+          },
+          {
+            new: true,
+          }
+        );
+        console.log("count==>", resto.value);
+
         const updatedUser = await User.findById(userId);
         res.status(200).json({
           message: updatedUser.favorites,
+          count: resto.favorite,
         });
       }
+    } catch (error: any) {
+      res.status(400).json({
+        message: error.message,
+      });
+    }
+  }
+);
+router.get(
+  "/user/favlist",
+  isAthenticated,
+  async (req: Request, res: Response) => {
+    console.log("get fav  list");
+
+    try {
+      const { id } = req.query;
+      const user = await User.findById(id);
+
+      res.status(200).json({
+        message: user.favorites,
+      });
     } catch (error: any) {
       res.status(400).json({
         message: error.message,

@@ -15,7 +15,7 @@ const router = express.Router();
 // import restaurant model
 const Restaurant = require("../models/Restaurant");
 const User = require("../models/User");
-const Review = require("../models/Restaurant");
+const Review = require("../models/Review");
 // isAthenticated
 const isAthenticated = require("../middlewares/isAuthenticated");
 // HOMEPAGE 20 BEST RESTAURANT ROUTE
@@ -60,15 +60,21 @@ router.get("/restaurant/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
 }));
 router.post("/restaurant/review", isAthenticated, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, body, userId, restaurantId, rating } = req.body;
+        const { title, body, userId, restaurantId, rating, pros, cons } = req.body;
+        console.log(req.body);
         const newReview = new Review({
             title: title,
             body: body,
             owner: userId,
             rating: rating,
             restaurantId: restaurantId,
+            pros: pros,
+            cons: cons,
         });
         yield newReview.save();
+        res.status(200).json({
+            message: "review saved",
+        });
     }
     catch (error) {
         res.status(400).json({

@@ -16,7 +16,6 @@ const isAthenticated = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         if (req.headers.authorization) {
             console.log(req.headers.authorization);
             const token = req.headers.authorization.replace("Bearer ", "");
-            console.log("token==>", token);
             const user = yield User.findOne({ token: token });
             if (user) {
                 return next();

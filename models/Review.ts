@@ -7,6 +7,9 @@ const reviewSchema = new Schema({
   owner: String,
   rating: String,
   restaurantId: String,
+  pros: Array,
+  cons: Array,
+  ownerName: String,
 });
 
 const Review = model("Review", reviewSchema);

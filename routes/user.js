@@ -94,24 +94,55 @@ router.post("/user/favorites", isAthenticated, (req, res) => __awaiter(void 0, v
             favorites: { $eq: restaurantId },
         });
         //   console.log("isexist==>", isExist);
+        let action = "inc";
         if (isExist) {
+            action = "dec";
             yield User.findByIdAndUpdate(userId, {
                 $pull: { favorites: restaurantId },
             });
+            const resto = yield Restaurant.findByIdAndUpdate(restaurantId, {
+                $inc: { favorite: -1 },
+            }, {
+                new: true,
+            });
+            console.log("count==>", resto);
             const updatedUser = yield User.findById(userId);
             res.status(200).json({
                 message: updatedUser.favorites,
+                count: resto.favorite,
             });
         }
         else {
             yield User.findByIdAndUpdate(userId, {
                 $push: { favorites: restaurantId },
             });
+            const resto = yield Restaurant.findByIdAndUpdate(restaurantId, {
+                $inc: { favorite: 1 },
+            }, {
+                new: true,
+            });
+            console.log("count==>", resto.value);
             const updatedUser = yield User.findById(userId);
             res.status(200).json({
                 message: updatedUser.favorites,
+                count: resto.favorite,
             });
         }
+    }
+    catch (error) {
+        res.status(400).json({
+            message: error.message,
+        });
+    }
+}));
+router.get("/user/favlist", isAthenticated, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("get fav  list");
+    try {
+        const { id } = req.query;
+        const user = yield User.findById(id);
+        res.status(200).json({
+            message: user.favorites,
+        });
     }
     catch (error) {
         res.status(400).json({

@@ -9,7 +9,7 @@ const router = express.Router();
 // import restaurant model
 const Restaurant = require("../models/Restaurant");
 const User = require("../models/User");
-const Review = require("../models/Restaurant");
+const Review = require("../models/Review");
 
 // isAthenticated
 const isAthenticated = require("../middlewares/isAuthenticated");
@@ -61,15 +61,31 @@ router.post(
   isAthenticated,
   async (req: Request, res: Response) => {
     try {
-      const { title, body, userId, restaurantId, rating } = req.body;
+      const {
+        title,
+        body,
+        userId,
+        restaurantId,
+        rating,
+        pros,
+        cons,
+        userName,
+      } = req.body;
+      console.log(req.body);
       const newReview = new Review({
         title: title,
         body: body,
         owner: userId,
+        ownerName: userName,
         rating: rating,
         restaurantId: restaurantId,
+        pros: pros,
+        cons: cons,
       });
       await newReview.save();
+      res.status(200).json({
+        message: "review saved",
+      });
     } catch (error: any) {
       res.status(400).json({
         message: error.messsage,
