@@ -10,6 +10,7 @@ const reviewSchema = new mongoose_1.Schema({
     restaurantId: String,
     pros: Array,
     cons: Array,
+    ownerName: String,
 });
 const Review = (0, mongoose_1.model)("Review", reviewSchema);
 module.exports = Review;

@@ -60,12 +60,13 @@ router.get("/restaurant/:id", (req, res) => __awaiter(void 0, void 0, void 0, fu
 }));
 router.post("/restaurant/review", isAthenticated, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, body, userId, restaurantId, rating, pros, cons } = req.body;
+        const { title, body, userId, restaurantId, rating, pros, cons, userName, } = req.body;
         console.log(req.body);
         const newReview = new Review({
             title: title,
             body: body,
             owner: userId,
+            ownerName: userName,
             rating: rating,
             restaurantId: restaurantId,
             pros: pros,
@@ -82,17 +83,37 @@ router.post("/restaurant/review", isAthenticated, (req, res) => __awaiter(void 0
         });
     }
 }));
-router.get("/rating", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/restaurants/search", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("search");
+    console.log("req.query==>", req.query);
     try {
-        const restos = yield Restaurant.find({});
-        restos.forEach((elem) => __awaiter(void 0, void 0, void 0, function* () {
-            elem.favorite = Math.floor(Math.random() * 10);
-            yield elem.save();
-        }));
-        res.send("ok");
+        let searchQuery = {
+            thumbnail: { $ne: "https://www.happycow.net/img/no-image.jpg" },
+        };
+        if (req.query.title) {
+            let title = String(req.query.title);
+            searchQuery.name = new RegExp(title, "gi");
+        }
+        if (req.query.type && req.query.type !== "All") {
+            searchQuery.type = req.query.type;
+        }
+        console.log("searchQuery==>", searchQuery);
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 20;
+        const restos = yield Restaurant.find(searchQuery)
+            .limit(limit)
+            .skip(limit * (page - 1))
+            .select("name address type description rating thumbnail");
+        const count = yield Restaurant.countDocuments(searchQuery);
+        res.status(200).json({
+            results: restos,
+            count: count,
+        });
     }
     catch (error) {
-        res.send(error.message);
+        res.status(400).json({
+            message: error.message,
+        });
     }
 }));
 module.exports = router;

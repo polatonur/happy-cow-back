@@ -93,20 +93,45 @@ router.post(
     }
   }
 );
-router.get("/rating", async (req: Request, res: Response) => {
+router.get("/restaurants/search", async (req: Request, res: Response) => {
+  console.log("search");
+  console.log("req.query==>", req.query);
+
   try {
-    interface resto {
-      save: () => void;
-      favorite: number;
+    type Query = {
+      name?: any;
+      type?: any;
+      thumbnail: any;
+    };
+    let searchQuery: Query = {
+      thumbnail: { $ne: "https://www.happycow.net/img/no-image.jpg" },
+    };
+    if (req.query.title) {
+      let title = String(req.query.title);
+      searchQuery.name = new RegExp(title, "gi");
     }
-    const restos: Array<resto> = await Restaurant.find({});
-    restos.forEach(async (elem) => {
-      elem.favorite = Math.floor(Math.random() * 10);
-      await elem.save();
+    if (req.query.type && req.query.type !== "All") {
+      searchQuery.type = req.query.type;
+    }
+    console.log("searchQuery==>", searchQuery);
+
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const restos = await Restaurant.find(searchQuery)
+      .limit(limit)
+      .skip(limit * (page - 1))
+      .select("name address type description rating thumbnail");
+
+    const count = await Restaurant.countDocuments(searchQuery);
+
+    res.status(200).json({
+      results: restos,
+      count: count,
     });
-    res.send("ok");
   } catch (error: any) {
-    res.send(error.message);
+    res.status(400).json({
+      message: error.message,
+    });
   }
 });
 
