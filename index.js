@@ -24,11 +24,11 @@ mongoose.connect(process.env.MONGODB_URI, {
 });
 // HOME ROUTE
 app.get("/", (req, res) => {
-    res.status(200).json({ message: "Welcome to my happ cow app" });
+    res.status(200).json({ message: "Welcome to my happy cow app" });
 });
 // ALL ROUTE
 app.all("*", (req, res) => {
     res.status(404).send("Oops!, Page not found");
 });
-const Port = 5000;
-app.listen(Port, () => console.log(`Server is running on port ${Port}`));
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
