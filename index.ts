@@ -30,7 +30,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // HOME ROUTE
 app.get("/", (req: Request, res: Response) => {
-  res.status(200).json({ message: "Welcome to my happ cow app" });
+  res.status(200).json({ message: "Welcome to my happy cow app" });
 });
 
 // ALL ROUTE
